@@ -53,39 +53,26 @@ export { io };
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  /* ----------------------------------------
-        USER JOINS THEIR PRIVATE ROOM
-     ---------------------------------------- */
+  // User joins personal room
   socket.on("join", (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined private room`);
   });
 
-  /* ========================================================
-        REAL-TIME CHAT: Messaging + Typing
-     ======================================================== */
+  /* ----------------------------- CHAT ----------------------------- */
 
-  // Typing indicator
   socket.on("chat:typing", ({ from, to }) => {
     io.to(to).emit("chat:typing", { from });
   });
 
-  // Send message event (real-time)
   socket.on("chat:send", (msg) => {
     console.log("CHAT MESSAGE EVENT:", msg);
 
-    const { from, to, text, createdAt } = msg;
-
-    // Deliver to receiver
-    io.to(to).emit("chat:message", msg);
-
-    // Deliver to sender so their UI updates instantly
-    io.to(from).emit("chat:message", msg);
+    io.to(msg.to).emit("chat:message", msg);
+    io.to(msg.from).emit("chat:message", msg);
   });
 
-  /* ========================================================
-        VIDEO CALL SIGNALING EVENTS
-     ======================================================== */
+  /* --------------------------- VIDEO CALL ------------------------- */
 
   socket.on("join-call", (roomId) => {
     socket.join(roomId);
@@ -121,7 +108,7 @@ io.on("connection", (socket) => {
 app.use(cors());
 app.use(express.json());
 
-// Register API routes
+// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -142,9 +129,15 @@ app.get("/api/admin-only", protect, authorizeRoles("admin"), (req, res) => {
     DATABASE + SERVER START
 ========================================================= */
 
+// Connect DB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
-server.listen(5000, () => console.log("Server running on port 5000"));
+// ⭐ IMPORTANT FOR RENDER ⭐
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
