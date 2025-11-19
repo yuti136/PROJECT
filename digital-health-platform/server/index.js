@@ -129,6 +129,10 @@ app.get("/api/admin-only", protect, authorizeRoles("admin"), (req, res) => {
     DATABASE + SERVER START
 ========================================================= */
 
+app.get("/", (req, res) => {
+  res.send("Digital Health Platform API is running...");
+});
+
 // Connect DB
 mongoose
   .connect(process.env.MONGO_URI)
