@@ -8,9 +8,19 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
+  // Important for Vercel SSR auto-detection
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+
+  // Ensures correct asset paths after build
+  base: "/",
 });
