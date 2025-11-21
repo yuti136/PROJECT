@@ -21,24 +21,45 @@ function Navbar() {
       <h2 className="text-xl font-bold text-blue-600">Digital Health Platform</h2>
 
       <div className="space-x-4 flex items-center">
+
         {/* Patient Links */}
         {role === "patient" && (
-          <a
-            href="/appointments/patient"
-            className="text-gray-700 hover:text-blue-600"
-          >
-            My Appointments
-          </a>
+          <>
+            <a
+              href="/appointments/patient"
+              className="text-gray-700 hover:text-blue-600"
+            >
+              My Appointments
+            </a>
+
+            {/* Chat link */}
+            <a
+              href="/chat"
+              className="text-gray-700 hover:text-blue-600"
+            >
+              Chat
+            </a>
+          </>
         )}
 
         {/* Provider Links */}
         {role === "provider" && (
-          <a
-            href="/appointments/provider"
-            className="text-gray-700 hover:text-blue-600"
-          >
-            Consultations
-          </a>
+          <>
+            <a
+              href="/appointments/provider"
+              className="text-gray-700 hover:text-blue-600"
+            >
+              Consultations
+            </a>
+
+            {/* Chat link */}
+            <a
+              href="/chat"
+              className="text-gray-700 hover:text-blue-600"
+            >
+              Chat
+            </a>
+          </>
         )}
 
         <Button variant="outline" onClick={logout}>

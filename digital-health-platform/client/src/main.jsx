@@ -9,6 +9,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Landing from "./pages/Landing.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Chat from "@/pages/Chat";
 
 import PatientAppointments from "./pages/PatientAppointments.jsx";
 import ProviderAppointments from "./pages/ProviderAppointments.jsx";
