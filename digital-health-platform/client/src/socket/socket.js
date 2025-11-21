@@ -1,12 +1,13 @@
 import { io } from "socket.io-client";
 
-// Correct BASE URL auto-switch
-const URL = import.meta.env.MODE === "production"
-  ? "https://health-jgt3.onrender.com"      // Render backend URL
-  : "http://localhost:5000";
+const URL = import.meta.env.PROD
+  ? import.meta.env.VITE_BACKEND_URL   // use .env in production
+  : "http://localhost:5000";            // use localhost in dev
 
 export const socket = io(URL, {
   autoConnect: false,
-  transports: ["websocket", "polling"],
-  withCredentials: true,
+  transports: ["websocket"],
+  reconnection: true,
+  reconnectionAttempts: 10,
 });
+console.log("ENV BACKEND:", import.meta.env.VITE_BACKEND_URL);
