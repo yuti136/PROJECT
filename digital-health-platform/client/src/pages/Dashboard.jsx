@@ -17,13 +17,11 @@ export default function Dashboard() {
 
   const [recent, setRecent] = useState([]);
 
-  // NEW: chart data state
   const [chartData, setChartData] = useState({
     dates: [],
     counts: [],
   });
 
-  // Load recent appointments (existing)
   useEffect(() => {
     async function load() {
       try {
@@ -37,7 +35,6 @@ export default function Dashboard() {
     load();
   }, []);
 
-  // NEW: Load analytics for chart (last 30 days)
   useEffect(() => {
     async function loadAnalytics() {
       try {
@@ -59,6 +56,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto space-y-6">
+
         {/* Top metrics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
@@ -87,9 +85,9 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Middle section: chart + recent */}
+        {/* Middle section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Chart card */}
+
           <div className="lg:col-span-2">
             <Card className="h-[300px] p-4">
               <h3 className="text-lg font-semibold mb-2">
@@ -166,22 +164,22 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Bottom quick links */}
+        {/* Bottom Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="p-4">
             <h4 className="font-semibold mb-2">Quick Actions</h4>
             <div className="space-y-2">
-              <a
-                href="/appointments/patient"
-                className="text-blue-600 hover:underline block"
-              >
+              <a href="/appointments/patient" className="text-blue-600 hover:underline block">
                 Book a new appointment
               </a>
-              <a
-                href="/appointments/provider"
-                className="text-blue-600 hover:underline block"
-              >
+
+              <a href="/appointments/provider" className="text-blue-600 hover:underline block">
                 See provider requests
+              </a>
+
+              {/* ⭐ NEW CHAT BUTTON ⭐ */}
+              <a href="/chat" className="text-blue-600 hover:underline block">
+                Open Chat Messages
               </a>
             </div>
           </Card>

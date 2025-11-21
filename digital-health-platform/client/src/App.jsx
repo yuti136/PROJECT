@@ -1,25 +1,40 @@
+// App.jsx
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 // Shadcn Toast Provider
 import { Toaster } from "@/components/ui/toaster";
 
-// Global Socket.io notification initializer
+// Global socket notifications
 import { initNotificationListeners } from "@/socket/globalNotifications";
 
-function App() {
+// Socket instance
+import { socket } from "@/socket";
 
-  // Initialize socket notifications once when the app loads
+function App() {
   useEffect(() => {
-    initNotificationListeners();
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    // Only connect socket AFTER login
+    if (token && userId) {
+      if (!socket.connected) {
+        socket.connect();
+        socket.emit("join", userId);
+        console.log("🔗 Socket connected from App.jsx");
+      }
+
+      // Initialize notification listeners
+      initNotificationListeners();
+    }
   }, []);
 
   return (
     <>
-      {/* All nested pages render here */}
+      {/* Nested routes render here */}
       <Outlet />
 
-      {/* Global Toast Notifications */}
+      {/* Toast notifications */}
       <Toaster />
     </>
   );
