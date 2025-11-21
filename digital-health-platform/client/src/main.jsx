@@ -9,7 +9,6 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Landing from "./pages/Landing.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import Chat from "@/pages/Chat";
 
 import PatientAppointments from "./pages/PatientAppointments.jsx";
 import ProviderAppointments from "./pages/ProviderAppointments.jsx";
@@ -28,26 +27,26 @@ import AdminAppointments from "./pages/admin/Appointments.jsx";
 // VIDEO CALL
 import VideoCall from "./pages/VideoCall.jsx";
 
-// CHAT PAGE 👍
+// CHAT PAGE (✔ ONLY THIS ONE)
 import Chat from "./pages/Chat.jsx";
 
-// 🔔 Shadcn Toast Provider
+// Shadcn toast
 import { Toaster } from "@/components/ui/toaster";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <>
       <Routes>
-        {/* ROOT */}
+        {/* Root */}
         <Route path="/" element={<App />}>
           <Route index element={<Landing />} />
         </Route>
 
-        {/* AUTH */}
+        {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* USER DASHBOARD */}
+        {/* Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -57,7 +56,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           }
         />
 
-        {/* APPOINTMENTS */}
+        {/* Appointments */}
         <Route
           path="/appointments/patient"
           element={
@@ -76,7 +75,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           }
         />
 
-        {/* VIDEO CALL ROUTE */}
+        {/* Video Call */}
         <Route
           path="/call/:roomId"
           element={
@@ -86,9 +85,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           }
         />
 
-        {/* ==========================
-            CHAT ROUTE
-           ========================== */}
+        {/* CHAT ROUTE */}
         <Route
           path="/chat"
           element={
@@ -98,9 +95,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           }
         />
 
-        {/* ==========================
-            ADMIN PANEL ROUTES
-           ========================== */}
+        {/* Admin routes */}
         <Route
           path="/admin/dashboard"
           element={
@@ -157,7 +152,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         />
       </Routes>
 
-      {/* GLOBAL TOASTER */}
       <Toaster />
     </>
   </BrowserRouter>
