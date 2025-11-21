@@ -41,20 +41,34 @@ function Login() {
       if (!res.ok) {
         toast({
           title: "Login failed",
-          description: data.message || "Invalid credentials",
+          description: data.message || "Invalid credentials.",
           variant: "destructive",
         });
         setLoading(false);
         return;
       }
 
-      // Save token + user info
+      /** ======================================
+       *  SAVE USER AUTH INFO
+       * ====================================== */
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role);
       localStorage.setItem("userId", data.user._id);
 
-      /** SOCKET LOGIN */
+      /** ======================================
+       *  SOCKET.IO LOGIN — IMPORTANT FIXES
+       * ====================================== */
+
+      // 1. Ensure clean socket before reconnecting
+      if (socket.connected) socket.disconnect();
+
+      // 2. Attach auth data (future JWT socket security)
+      socket.auth = { userId: data.user._id };
+
+      // 3. Connect socket
       socket.connect();
+
+      // 4. Join private room
       socket.emit("join", data.user._id);
 
       toast({
@@ -62,7 +76,9 @@ function Login() {
         description: `Logged in as ${data.user.role}.`,
       });
 
-      // Redirect based on role
+      /** ======================================
+       *  REDIRECT BASED ON ROLE
+       * ====================================== */
       if (data.user.role === "patient") {
         navigate("/appointments/patient");
       } else if (data.user.role === "provider") {
@@ -108,11 +124,7 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <Button
-            className="w-full"
-            onClick={handleLogin}
-            disabled={loading}
-          >
+          <Button className="w-full" onClick={handleLogin} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </Button>
 

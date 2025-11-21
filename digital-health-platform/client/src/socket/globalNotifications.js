@@ -1,6 +1,6 @@
 // client/src/socket/globalNotifications.js
 import { socket } from "./socket";
-import { toast } from "sonner"; // Sonner works globally
+import { toast } from "sonner";
 
 let initialized = false;
 
@@ -8,15 +8,14 @@ export function initNotificationListeners() {
   if (initialized) return;
   initialized = true;
 
-  console.log("🔔 Socket notifications active...");
+  console.log("🔔 Global Socket Notifications Active");
 
-  /* ========================================
-       APPOINTMENTS
-  =========================================== */
-
+  /* ================================
+        APPOINTMENT NOTIFICATIONS
+     ================================ */
   socket.on("appointment:requested", (data) => {
     toast.info(
-      `New appointment request from ${data.patientName} for ${new Date(
+      `New appointment request from ${data.patientName} — ${new Date(
         data.scheduledAt
       ).toLocaleString()}`
     );
@@ -24,7 +23,7 @@ export function initNotificationListeners() {
 
   socket.on("appointment:created", (data) => {
     toast.success(
-      `Appointment created for ${new Date(
+      `Appointment created — ${new Date(
         data.scheduledAt
       ).toLocaleString()}`
     );
@@ -32,18 +31,22 @@ export function initNotificationListeners() {
 
   socket.on("appointment:accepted", (data) => {
     toast.success(
-      `Your appointment was accepted — scheduled at ${new Date(
+      `Your appointment was accepted — ${new Date(
         data.scheduledAt
       ).toLocaleString()}`
     );
   });
 
-  /* ========================================
-       CHAT NOTIFICATIONS
-  =========================================== */
+  /* ================================
+        REAL-TIME CHAT NOTIFICATIONS
+     ================================ */
   socket.on("chat:message", (msg) => {
+    // prevent notification appearing on your own messages
+    const userId = localStorage.getItem("userId");
+    if (msg.from === userId) return;
+
     toast(
-      `${msg.fromName || "New Message"}: ${msg.text.substring(0, 40)}...`
+      `${msg.fromName || "New message"}: ${msg.text.substring(0, 40)}...`
     );
   });
 }
