@@ -23,14 +23,14 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ✔ Allow frontend in both dev + production
+// ✔ Allowed frontend URLs (local + vercel)
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://health-4ewd9u0i3-euticus-projects.vercel.app"
+  "https://health-4ewd9u0i3-euticus-projects.vercel.app",
 ];
 
 /* =========================================================
-   EXPRESS CORS (CRITICAL)
+   GLOBAL CORS MIDDLEWARE (Express v5 SAFE)
 ========================================================= */
 app.use(
   cors({
@@ -41,14 +41,12 @@ app.use(
   })
 );
 
-// Fix preflight properly for Express v5
-app.options("/**", cors());
-
+// ❌ DO NOT add app.options("*") — breaks Express v5
 
 app.use(express.json());
 
 /* =========================================================
-   SOCKET.IO — with SAME CORS config
+   SOCKET.IO — with CORS
 ========================================================= */
 const io = new Server(server, {
   cors: {
@@ -129,7 +127,7 @@ app.get("/api/admin-only", protect, authorizeRoles("admin"), (req, res) => {
   res.json({ message: "Welcome Admin", user: req.user });
 });
 
-// For Render
+// For Render health check
 app.get("/", (req, res) => {
   res.send("Digital Health Platform API is running...");
 });
