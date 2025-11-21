@@ -45,6 +45,9 @@ function PatientAppointments() {
       return;
     }
 
+    // 🔥 SAVE PROVIDER ID FOR CHAT
+    localStorage.setItem("providerId", providerId);
+
     const result = await createAppointment(token, {
       provider: providerId,
       scheduledAt: date,

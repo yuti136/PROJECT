@@ -25,13 +25,27 @@ function ProviderAppointments() {
   }, []);
 
   const handleAccept = async (id) => {
+    const appt = appointments.find((a) => a._id === id);
+
+    if (!appt) {
+      alert("Appointment not found.");
+      return;
+    }
+
+    // 🔥 Save patientId for chat
+    if (appt.patient?._id) {
+      localStorage.setItem("patientId", appt.patient._id);
+    }
+
     const result = await acceptAppointment(token, id);
     alert(result.message);
     loadAppointments();
   };
 
   const handleReject = async (id) => {
-    const confirmReject = confirm("Are you sure you want to reject this appointment?");
+    const confirmReject = confirm(
+      "Are you sure you want to reject this appointment?"
+    );
     if (!confirmReject) return;
 
     const result = await rejectAppointment(token, id);
