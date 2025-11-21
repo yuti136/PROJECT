@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 
-// ROUTES
 import authRoutes from "./src/routes/auth.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import appointmentRoutes from "./src/routes/appointmentRoutes.js";
@@ -13,7 +12,6 @@ import analyticsRoutes from "./src/routes/analyticsRoutes.js";
 import adminRoutes from "./src/routes/adminRoutes.js";
 import chatRoutes from "./src/routes/chatRoutes.js";
 
-// MIDDLEWARE
 import { protect } from "./src/middleware/authMiddleware.js";
 import { authorizeRoles } from "./src/middleware/roleMiddleware.js";
 
@@ -25,22 +23,46 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// ⭐ FIXED FOR RENDER + FRONTEND
+// ✔ Allow frontend in both dev + production
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://health-4ewd9u0i3-euticus-projects.vercel.app"
+];
+
+/* =========================================================
+   EXPRESS CORS (CRITICAL)
+========================================================= */
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// Fix preflight
+app.options("*", cors());
+
+app.use(express.json());
+
+/* =========================================================
+   SOCKET.IO — with SAME CORS config
+========================================================= */
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://health-4ewd9u0i3-euticus-projects.vercel.app"
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 export { io };
 
 /* =========================================================
-   SOCKET.IO — CHAT + VIDEO CALL + NOTIFICATIONS
+   SOCKET.IO EVENTS
 ========================================================= */
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
@@ -50,18 +72,17 @@ io.on("connection", (socket) => {
     console.log(`User ${userId} joined their private room`);
   });
 
-  /* ---------------------- CHAT ---------------------- */
+  /* ---------------- CHAT ---------------- */
   socket.on("chat:typing", ({ from, to }) => {
     io.to(to).emit("chat:typing", { from });
   });
 
   socket.on("chat:send", (msg) => {
-    // Emit to receiver and sender
-    io.to(msg.to).emit("chat:message", msg);
-    io.to(msg.from).emit("chat:message", msg);
+    io.to(msg.to).emit("chat:message", msg);   // to receiver
+    io.to(msg.from).emit("chat:message", msg); // to sender
   });
 
-  /* --------------------- WEBRTC --------------------- */
+  /* ---------------- WEBRTC ---------------- */
   socket.on("join-call", (roomId) => {
     socket.join(roomId);
     socket.to(roomId).emit("user-joined", socket.id);
@@ -89,12 +110,8 @@ io.on("connection", (socket) => {
 });
 
 /* =========================================================
-    EXPRESS MIDDLEWARE + ROUTES
+   API ROUTES
 ========================================================= */
-app.use(cors());
-app.use(express.json());
-
-// API ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -102,7 +119,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
 
-// Debug route
+// Debug routes
 app.get("/api/protected", protect, (req, res) => {
   res.json({ message: "Protected OK", user: req.user });
 });
@@ -111,7 +128,7 @@ app.get("/api/admin-only", protect, authorizeRoles("admin"), (req, res) => {
   res.json({ message: "Welcome Admin", user: req.user });
 });
 
-// Root route for Render health checks
+// For Render
 app.get("/", (req, res) => {
   res.send("Digital Health Platform API is running...");
 });
@@ -119,20 +136,15 @@ app.get("/", (req, res) => {
 /* =========================================================
    DATABASE + SERVER START
 ========================================================= */
-
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) {
-  console.error("❌ ERROR: Missing MONGO_URI in environment variables");
-} else {
-  mongoose
-    .connect(MONGO_URI)
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.log("MongoDB connection error:", err));
-}
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+server.listen(PORT, () =>
+  console.log(`🚀 Server running on port ${PORT}`)
+);
