@@ -27,6 +27,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:5173",
   "https://health-4ewd9u0i3-euticus-projects.vercel.app",
+  "https://health-1rn4unmtj-euticus-projects.vercel.app"
 ];
 
 /* =========================================================
@@ -34,12 +35,23 @@ const allowedOrigins = [
 ========================================================= */
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // mobile apps, Postman
+
+      // Allow any Vercel preview deploys
+      if (origin.includes("vercel.app")) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      console.log("❌ BLOCKED ORIGIN —", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 // ❌ DO NOT add app.options("*") — breaks Express v5
 
