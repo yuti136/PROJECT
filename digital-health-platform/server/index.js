@@ -41,8 +41,9 @@ app.use(
   })
 );
 
-// Fix preflight
-app.options("*", cors());
+// Fix preflight properly for Express v5
+app.options("/**", cors());
+
 
 app.use(express.json());
 
